@@ -18,10 +18,9 @@ const cloudinaryUpload = async (localFile) => {
     const response = await cloudinary.uploader.upload(localFile, {
       resource_type: "image",
     });
-    if(!response) {
-      throw new Error("No response from cloudinary");
-    }
+    
     console.log("Response:::::", response);
+     fs.unlinkSync(localFile);
     return response.url;
   } catch (err) {
     fs.unlinkSync(localFile);
