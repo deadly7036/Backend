@@ -169,7 +169,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.cookies.refreshToken || req.body;
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(400, "Please provide refresh token");
@@ -410,7 +410,7 @@ const getAllChannelInfo = asyncHandler(async (req, res) => {
 const getWatchHistory = asyncHandler(async (req,res) => {
   const watchHistory = await User.aggregate({
     $match : {
-       _id:new mongoose.Types.ObjectId(req.user?._id)
+       _id:new mongoose.Schema.Types.ObjectId(req.user?._id)
     }
   },{
     $lookup : {

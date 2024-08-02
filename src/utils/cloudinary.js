@@ -16,7 +16,7 @@ const cloudinaryUpload = async (localFile) => {
     }
 
     const response = await cloudinary.uploader.upload(localFile, {
-      resource_type: "image",
+      resource_type: "auto",
     });
     
     console.log("Response:::::", response);
