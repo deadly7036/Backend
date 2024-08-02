@@ -21,7 +21,7 @@ const cloudinaryUpload = async (localFile) => {
     
     console.log("Response:::::", response);
      fs.unlinkSync(localFile);
-    return response.url;
+    return response;
   } catch (err) {
     fs.unlinkSync(localFile);
     console.log(err);

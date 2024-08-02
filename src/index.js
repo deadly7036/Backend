@@ -1,6 +1,6 @@
 import { connectDB } from "./db/index.js";
 import { app } from "./app.js";
-
+//import {User} from "./models/user.model.js";
 
 /*console.log("Cloudinary Config:", {
   cloud_name: process.env.name ? "SET" : "NOT SET",
@@ -8,6 +8,26 @@ import { app } from "./app.js";
   api_secret: process.env.Secret ? "SET" : "NOT SET",
 });
 */
+
+
+/*const testMatchPassword = async () => {
+  try {
+    const user = await User.findOne({ username: "deadly7036" });
+  if (user) {
+    const isMatch = await user.matchPassword("deadly7036");
+    console.log(isMatch ? "Password match" : "Password does not match");
+  }
+  } catch (err) {
+    console.log(err);
+  }
+  
+};
+
+testMatchPassword();
+
+
+*/
+
 connectDB()
   .then(() => {
     app.on("error", (error) => {
