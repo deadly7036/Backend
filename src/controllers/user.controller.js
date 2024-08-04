@@ -63,7 +63,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatar = await cloudinaryUpload(avatarLocalFile);
   // console.log("avatar ", avatar)
 
-  let coverImageUrl = "";
+  let coverImageUrl;
 
   if (coverImageLocalFile) {
     coverImageUrl = await cloudinaryUpload(coverImageLocalFile);
