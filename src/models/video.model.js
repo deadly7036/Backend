@@ -4,11 +4,17 @@ import mongoose,{Schema} from "mongoose";
 
 const videoSchema = new Schema({
    videofile: {
-     type: String,
+     type: {
+       url:String,
+       public_id:String
+     },
      required:true
    },
    thumbnail: {
-     type: String,
+     type: {
+       url:String,
+       public_id:String
+     },
      required:true
    },
   title: {

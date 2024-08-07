@@ -29,10 +29,17 @@ const userSchema = new Schema(
       index: true,
     },
     avatar: {
-      type: String,
+      type: {
+        url:String,
+        public_id:String
+      },
       required: true,
     },
     coverImage: {
+      type: {
+        url:String,
+        public_id:String
+      },
       type: String,
     },
     password: {

@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { cloudinaryUpload } from "../utils/cloudinary.js";
+import { cloudinaryUpload,deleteOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 
 async function generateAccessAndRefreshToken(userId) {
@@ -78,8 +78,14 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     fullName,
-    avatar: avatar.url,
-    coverImage: coverImageUrl.url || "",
+    avatar: {
+      url: avatar.secure_url,
+      public_id: avatar.public_id,
+    },
+    coverImage: {
+      url: coverImageUrl.secure_url,
+      public_id: coverImageUrl.public_id,
+    }
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -280,6 +286,8 @@ const updateAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please upload an avatar");
   }
 
+  const oldAvatar = await User.findById(req.user?._id);
+
   const avatar = await cloudinaryUpload(avatarLocalFile);
 
   if (!avatar) {
@@ -298,6 +306,11 @@ const updateAvatar = asyncHandler(async (req, res) => {
     },
   ).select(" -password ");
 
+
+  if(oldAvatar.avatar.public_id && user.avatar.public_id) {
+    await deleteOnCloudinary(oldAvatar.avatar.public_id,"image")
+  }
+
   if (!user) {
     throw new ApiError(400, "File not updated");
   }
@@ -313,6 +326,8 @@ const updateCoverImage = asyncHandler(async (req, res) => {
   if (!coverLocalFile) {
     throw new ApiError(400, "Please upload an avatar");
   }
+
+  const oldCover = await User.findById(req.user?._id);
 
   const coverImage = await cloudinaryUpload(coverLocalFile);
 
@@ -331,6 +346,10 @@ const updateCoverImage = asyncHandler(async (req, res) => {
       new: true,
     },
   ).select(" -password ");
+
+  if(oldCover.coverImage.public_id && user.coverImage.public_id) {
+    await deleteOnCloudinary(oldCover.coverImage.public_id,"image")
+  }
 
   if (!user) {
     throw new ApiError(400, "File not updated");
@@ -410,7 +429,7 @@ const getAllChannelInfo = asyncHandler(async (req, res) => {
 const getWatchHistory = asyncHandler(async (req,res) => {
   const watchHistory = await User.aggregate({
     $match : {
-       _id:new mongoose.Schema.Types.ObjectId(req.user?._id)
+       _id:new mongoose.Types.ObjectId(req.user?._id)
     }
   },{
     $lookup : {
