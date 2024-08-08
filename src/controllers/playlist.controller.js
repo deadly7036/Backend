@@ -98,92 +98,78 @@ const createPlaylist = asyncHandler(async (req,res) =>{
 
 
 
-const getPlaylistById = asyncHandler(async (req,res) =>{
-   const {playlistId} = req.params;
 
-    validateObjectId(playlistId,"playlist")
+const getPlaylistById = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
 
- const playlist = await findById(Playlist,playlistId,"playlist")
+    validateObjectId(playlistId, "playlist");
 
     const playlistAggregation = await Playlist.aggregate([
         {
-    $match: {
-        _id: new mongoose.Types.ObjectId(playlist?._id)
+            $match: {
+                _id: new mongoose.Types.ObjectId(playlistId),
+            },
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "videos",
+                pipeline: [
+                    { $match: { isPublished: true } },
+                    {
+                        $project: {
+                            "videoFile.url": 1,
+                            "thumbnail.url": 1,
+                            title: 1,
+                            description: 1,
+                            duration: 1,
+                            createdAt: 1,
+                            views: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails",
+            },
+        },
+        {
+            $addFields: {
+                owner: { $first: "$ownerDetails" },
+                totalVideos: { $size: "$videos" },
+                totalViews: { $sum: "$videos.views" },
+            },
+        },
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                "owner.avatar.url": 1,
+                "owner.username": 1,
+                "owner.fullName": 1,
+                totalVideos: 1,
+                totalViews: 1,
+                videos: 1,
+            },
+        },
+    ]);
+
+    if (!playlistAggregation.length) {
+        throw new ApiError(404, "Playlist not found");
     }
-        },
-        {
-        $lookup: {
-      from : "videos",
-      localField: "video",
-       foreignField: "_id",
-        as: "videos"
-        }
-        },
-        {
-       $match: {
-         "videos.isPublished":true
-       }
-        },
-        {
-    $loolup: {
-    from : "users",
-   localField: "owner",
-     foreignField: "_id",
-     as: "ownerDetails"
-    }
-        },
-        {
-       $addFields: {
-         owner: {
-           $first: "$ownerDetails"
-         },
-          totalVideos: {
-              $size: "$videos"
-          },
-           totalViews: {
-              $sum: "$videos.views"
-           }
-           }
-       },
-        {
-         $project: {
-           name:1,
-          description:1,
-          createdAt:1,
-          updatedAt:1,
-          owner: {
-            "avatar.url":1,
-              username:1,
-              fullName:1
-          },
-          totalVideos:1,
-          totalViews:1,
-          videos: {
-            "videoFile.url":1,
-            "thumbnail.url":1,
-            title:1,
-            description:1,
-            duration: 1,
-            createdAt: 1,
-            views: 1
-          }
-             
-         }
-        }
-        
-        
-    ])
 
-
-    if(playlistAggregation.length === 0) {
-        throw new ApiError(404,"Playlist not found")
-    }
-    
-
-
-    return res.status(200).json(new ApiResponse(200,playlistAggregation[0],"Playlist fetched successfully"))
-
-    
+    return res
+        .status(200)
+        .json(new ApiResponse(200, playlistAggregation[0], "Playlist fetched successfully"));
 })
 
 
