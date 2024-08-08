@@ -130,7 +130,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
             isLiked: true,
         }),
     );
-});
+}); 
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos

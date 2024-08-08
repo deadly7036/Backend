@@ -123,7 +123,7 @@ const addComment = asyncHandler(async (req, res) => {
     });
 
     if (!comment) {
-        throw new ApiError(500, "Comment not added");
+        throw new ApiError(500, "Comment not created");
     }
 
     res.status(201).json(new ApiResponse(201, comment, "Comment added"));
