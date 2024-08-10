@@ -17,7 +17,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     }
 
      const findChannel = await Subscription.findOne({
-         subscriber:req.user?_id,
+         subscriber:req.user?._id,
          channel:channelId
      })
 

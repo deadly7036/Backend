@@ -1,5 +1,6 @@
 import { connectDB } from "./db/index.js";
 import { app } from "./app.js";
+
 //import {User} from "./models/user.model.js";
 
 /*console.log("Cloudinary Config:", {
@@ -33,6 +34,8 @@ connectDB()
     app.on("error", (error) => {
       console.log("Connecting Error!!!!", error);
     });
+
+    
 
     app.listen(3000, () => {
       console.log("Server is running on port 3000");
