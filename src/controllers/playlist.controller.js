@@ -200,7 +200,54 @@ const deletePlaylist = asyncHandler(async (req,res) =>{
 
 
 const getUserPlaylists = asyncHandler(async(req,res) => {
-  
+  const {userId} = req.params;
+
+    validateObjectId(userId,"user");
+
+
+    const userPlaylist = await Playlist.aggregate(
+        [
+   {
+    owner: new mongoose.Types.ObjectId(userId)
+   },
+     {
+     $lookup: {
+       from: "videos",
+       localField: "video",
+        foriegnField: "_id",
+         as: "videos",
+     }
+    },
+     {
+       $addFields: {
+          totalViews: {
+              $sum: "$videos.views"
+          },
+          totalVideos: {
+              $size: "$videos"
+          }
+       }
+    },{
+         $project: {
+             totalViews:1,
+             totalVideos:1,
+              videos:1,
+              createdAt:1,
+              updatedAt:1,
+              name:1,
+              description:1,
+         }
+    }
+        ]
+    )
+
+
+    if(!userPlaylist.length) {
+        throw new ApiError(404,"User playlist not found")
+    }
+
+
+    return res.status(200).json(new ApiResponse(200,userPlaylist,"User playlist fetched successfully"))
 })
 
 const removeVideoFromPlaylist = asyncHandler(async (req,res) =>{
