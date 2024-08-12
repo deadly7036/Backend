@@ -8,6 +8,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
+
+  
   const totalSubscribers = await Subscription.aggregate([
     {
       $match: {
@@ -61,12 +63,23 @@ const getChannelStats = asyncHandler(async (req, res) => {
     },
   ]);
 
+
+
+
+  if(!videoCount.length) {
+    throw new ApiError(404, "No Video Found");
+  }
+
   const channelStats = {
     totalSubscribers: (totalSubscribers[0] && totalSubscribers[0].subscriberCount) || 0,
     totalLikes: (videoCount[0] && videoCount[0].totalLikes) || 0,
     totalViews: (videoCount[0] && videoCount[0].totalViews) || 0,
     totalVideos: (videoCount[0] && videoCount[0].totalVideos) || 0,
   };
+
+  if(!channelStats) {
+    throw new ApiError(404, "No Channel Stats Found");
+  }
 
   return res.status(200).json(new ApiResponse(200, channelStats, "Channel stats fetched successfully"));
 });
@@ -113,6 +126,10 @@ const getChannelVideos = asyncHandler(async (req, res) => {
       }
     }
   ])
+
+  if(!channelVideos.length) {
+    throw new ApiError(404, "No Video Found");
+  }
 
   return res.status(200).json(new ApiResponse(200, channelVideos, "Channel videos fetched successfully"));
   
