@@ -115,6 +115,12 @@ channel: new mongoose.Types.ObjectId(channelId)
     return res.status(201).json(new ApiResponse(201, subscriberList, "Successfully fetched subscriber list"))
 })
 
+
+
+
+
+
+
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params
@@ -179,6 +185,8 @@ return res.status(200).json(new ApiResponse(200, subscribedChannels, "Successful
 
     
 })
+
+
 
 export {
     toggleSubscription,

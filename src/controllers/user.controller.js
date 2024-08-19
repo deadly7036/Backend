@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
       (fields) => fields?.trim() === "",
     )
   ) {
-    return new ApiError(400, "Please fill all fields");
+    throw new ApiError(400, "Please fill all fields");
   }
 
   const existedUser = await User.findOne({
@@ -298,7 +298,10 @@ const updateAvatar = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar: avatar.url,
+       avatar : {
+         url: avatar.secure_url,
+      public_id: avatar.public_id,
+       }
       },
     },
     {
@@ -339,12 +342,17 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        coverImage: coverImage.url,
-      },
+        coverImage : {
+         url: coverImage.secure_url,
+      public_id: coverImage.public_id,
+        }
+      }
+      
     },
+      
     {
       new: true,
-    },
+    }
   ).select(" -password ");
 
   if(oldCover.coverImage.public_id && user.coverImage.public_id) {
@@ -395,7 +403,7 @@ const getAllChannelInfo = asyncHandler(async (req, res) => {
         channelsSubscribedToCount: { $size: "$subscribedTo" },
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user?._id, "$subscribers"] },
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
             then: true,
             else: false,
           },

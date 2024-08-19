@@ -99,6 +99,9 @@ throw new ApiError(404,"No Comments Found")
     
 });
 
+
+
+
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
     const { videoId } = req.params;

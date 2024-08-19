@@ -1,7 +1,7 @@
  import express from "express";
 import cookieParser from "cookie-parser";
 
-import {errorHandler} from "./utils/errorHandler.js"
+//import {errorHandler} from "./utils/errorHandler.js"
 
 
 const app = express();
@@ -41,5 +41,5 @@ app.use("/api/v1/subscription",subscriptionRouter)
 
 
 
-app.use(errorHandler)
+//app.use(errorHandler)
 export {app}

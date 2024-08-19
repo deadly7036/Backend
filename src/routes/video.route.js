@@ -18,10 +18,10 @@ router
     .get(getAllVideos);
     
     
-router.route("/add").post(
+router.route("/v").post(
         upload.fields([
             {
-                name: "videoFile",
+                name: "videofile",
                 maxCount: 1,
             },
             {

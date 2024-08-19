@@ -29,7 +29,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
   const videoCount = await Video.aggregate([
     {
       $match: {
-        owner: new mongoose.Schema.Types.ObjectId(req.user?._id),
+        owner: new mongoose.Types.ObjectId(req.user?._id),
       },
     },
     {
@@ -45,6 +45,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
         totalLikes: {
           $size: "$likesCount",
         },
+       totalViews: "$views",
+        totalVideos:1
       },
     },
     {
@@ -54,10 +56,10 @@ const getChannelStats = asyncHandler(async (req, res) => {
           $sum: "$totalLikes",
         },
         totalViews: {
-          $sum: "$views",
+          $sum: "$totalViews",
         },
         totalVideos: {
-          $sum: 1,
+          $sum: "$totalVideos",
         },
       },
     },
@@ -83,6 +85,9 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, channelStats, "Channel stats fetched successfully"));
 });
+
+
+
 
 
 const getChannelVideos = asyncHandler(async (req, res) => {
@@ -117,9 +122,9 @@ const getChannelVideos = asyncHandler(async (req, res) => {
       $project: {
         _id: 1,
         title: 1,
-        thumbnail: 1,
+        "thumbnail.url": 1,
         description:1,
-        videoFile:1,
+        "videoFile.url":1,
         isPublished: 1,
         likesCount: 1,
         createdAt:1,
@@ -134,5 +139,13 @@ const getChannelVideos = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, channelVideos, "Channel videos fetched successfully"));
   
 });
+
+
+
+
+
+
+
+
 
 export { getChannelStats, getChannelVideos };
