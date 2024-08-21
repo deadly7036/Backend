@@ -66,6 +66,20 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
 
 
+    
+if(limitNumber) {
+        pipeline.push({
+            $limit: limitNumber
+        })
+}
+
+
+     if(pageNumber) {
+         pipeline.push({
+             $skip: (pageNumber -1) * limitNumber
+         })
+     }
+
     pipeline.push({
         $lookup: {
             from: "users",
@@ -87,19 +101,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
          $unwind: "$ownerDetails"
 
     })
-if(limitNumber) {
-        pipeline.push({
-            $limit: limitNumber
-        })
-}
-
-
-     if(pageNumber) {
-         pipeline.push({
-             $skip: (pageNumber -1) * limitNumber
-         })
-     }
-
    
 
     const videos = await Video.aggregate(pipeline);
@@ -202,7 +203,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please fill all fields");
     }
 
-    const videoFile = req.files?.videoFile[0]?.path;
+    const videoFile = req.files?.videofile[0]?.path;
 
     if (!videoFile) {
         throw new ApiError(400, "Please upload a video file");
@@ -354,7 +355,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         {
             $project: {
                 comments:1,
-                videoFile: 1,
+                videofile: 1,
                 title: 1,
                 description: 1,
                 views: 1,
@@ -450,7 +451,10 @@ const updateVideo = asyncHandler(async (req, res) => {
             $set: {
                 title,
                 description,
-                thumbnail: uploadOnCloudinary.url,
+                thumbnail: {
+        url: uploadOnCloudinary.secure_url,
+      pubic_id: uploadOnCloudinary.public_id,
+                },
             },
         },
         {
@@ -493,7 +497,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
     const deleteVideo = await Video.findByIdAndDelete(video?._id);
 
-    if(video.videoFile.public_id) {
+    if(video.videofile.public_id) {
         await deleteOnCloudinary(video.videoFile.public_id,"video")
     }
 

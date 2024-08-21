@@ -165,7 +165,7 @@ const subscribedChannels = await Subscription.aggregate([
               latestVideo: {
                title:1,
             description:1,
-             "videoFile.url":1,
+             "videofile.url":1,
              "thumbnail.url":1,
               views:1,
                 duration:1,

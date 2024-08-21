@@ -215,7 +215,7 @@ const changingPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   if (!(oldPassword || newPassword)) {
-    return new ApiError(400, "Please enter old password and new password");
+    throw new ApiError(400, "Please enter old password and new password");
   }
 
   const user = await User.findById(req.user?._id);
@@ -417,8 +417,8 @@ const getAllChannelInfo = asyncHandler(async (req, res) => {
         subscribersCount: 1,
         channelsSubscribedToCount: 1,
         isSubscribed: 1,
-        avatar: 1,
-        coverImage: 1,
+        "avatar.url": 1,
+        "coverImage.url": 1,
         email: 1,
       },
     },
@@ -455,7 +455,7 @@ const getWatchHistory = asyncHandler(async (req,res) => {
            pipeline: [
              {
                $project: {
-                 avatar:1,
+                 "avatar.url":1,
                  username:1,
                  fullName:1,
                }
